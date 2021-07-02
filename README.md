@@ -13,3 +13,5 @@ Make sure you are running project on a real device and allow access to your phon
     - Connect your real device and Run the project via Xcode/Android studio
     
 #### Patch-package has been used to extend animations while scanning.
+
+Screen recording - https://drive.google.com/drive/folders/1IAIQtK81l8pTu0XQ1-nYrVqzmzA_QAKA?usp=sharing
