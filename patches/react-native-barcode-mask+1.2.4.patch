@@ -1,0 +1,133 @@
+diff --git a/node_modules/react-native-barcode-mask/AnimatedView.js b/node_modules/react-native-barcode-mask/AnimatedView.js
+new file mode 100644
+index 0000000..c02dd58
+--- /dev/null
++++ b/node_modules/react-native-barcode-mask/AnimatedView.js
+@@ -0,0 +1,45 @@
++import React, { useRef, useEffect, Children } from 'react';
++import { Text, View, StyleSheet, Animated } from 'react-native';
++
++
++export default function AnimatedView(props) {
++  const anim = useRef(new Animated.Value(1));
++
++  useEffect(() => {
++    // makes the sequence loop
++    Animated.loop(
++      // runs given animations in a sequence
++      Animated.sequence([
++        // increase size
++        Animated.timing(anim.current, {
++          toValue: 1, 
++          duration: 800,
++          useNativeDriver: true,
++        }),
++        // decrease size
++        Animated.timing(anim.current, {
++          toValue: 1.1, 
++          duration: 500,
++          useNativeDriver: true,
++        }),
++      ])
++    ).start();
++  }, []);
++
++  return (
++    <View style={styles.container}>
++      <Animated.View style={{ transform: [{ scale: anim.current }] }}>
++        {props.children}
++      </Animated.View>
++    </View>
++  );
++}
++
++const styles = StyleSheet.create({
++  container: {
++    flex: 1,
++    justifyContent: 'center',
++    alignItems: 'center',
++    backgroundColor: 'transparent',
++  },
++});
+diff --git a/node_modules/react-native-barcode-mask/index.js b/node_modules/react-native-barcode-mask/index.js
+index 558eaca..deda050 100644
+--- a/node_modules/react-native-barcode-mask/index.js
++++ b/node_modules/react-native-barcode-mask/index.js
+@@ -1,6 +1,7 @@
+ import React from 'react';
+-import { Animated, StyleSheet, View } from 'react-native';
++import { Animated, Easing, StyleSheet, View } from 'react-native';
+ import PropTypes from 'prop-types';
++import AnimatedView from './AnimatedView';
+ 
+ const styles = StyleSheet.create({
+   container: {
+@@ -104,13 +105,15 @@ class BarcodeMask extends React.Component {
+       Animated.sequence([
+         Animated.timing(this.state[propertyToChange], {
+           toValue: endValue,
+-          duration: lineAnimationDuration,
+-          useNativeDriver
++          duration: 500,
++          useNativeDriver,
++          easing: Easing.inOut(Easing.ease)
+         }),
+         Animated.timing(this.state[propertyToChange], {
+           toValue: startValue,
+-          duration: lineAnimationDuration,
+-          useNativeDriver
++          duration: 800,
++          useNativeDriver,
++          easing: Easing.inOut(Easing.ease)
+         })
+       ])
+     );
+@@ -121,7 +124,6 @@ class BarcodeMask extends React.Component {
+     const { backgroundColor, outerMaskOpacity } = this.props;
+     return { backgroundColor, opacity: outerMaskOpacity, flex: 1 };
+   };
+-
+   _renderEdge = (edgePosition) => {
+     const { edgeWidth, edgeHeight, edgeColor, edgeBorderWidth, edgeRadius } = this.props;
+     const { edgeRadiusOffset } = this.state;
+@@ -160,7 +162,7 @@ class BarcodeMask extends React.Component {
+         left: edgeRadiusOffset,
+       },
+     };
+-    return <View style={[defaultStyle, styles[edgePosition + 'Edge'], edgeBorderStyle[edgePosition]]} />;
++    return <View style={[defaultStyle, styles[edgePosition + 'Edge'], edgeBorderStyle[edgePosition]]} />    ;
+   };
+ 
+   _calculateLineTravelWindowDistance({ layout, isHorizontalOrientation }) {
+@@ -218,6 +220,8 @@ class BarcodeMask extends React.Component {
+ 
+     return (
+       <View style={[styles.container]}>
++        {showAnimatedLine ? (
++        <AnimatedView>
+         <View
+           style={[ styles.finder, { width, height } ]}
+           onLayout={this._onFinderLayoutMeasured}
+@@ -232,6 +236,22 @@ class BarcodeMask extends React.Component {
+             />
+           )}
+         </View>
++        </AnimatedView>
++        )
++        : <View
++        style={[ styles.finder, { width, height } ]}
++        onLayout={this._onFinderLayoutMeasured}
++      >
++        {this._renderEdge('topLeft')}
++        {this._renderEdge('topRight')}
++        {this._renderEdge('bottomLeft')}
++        {this._renderEdge('bottomRight')}
++        {showAnimatedLine && (
++          <Animated.View
++            style={[ styles.animatedLine, animatedLineStyle ]}
++          />
++        )}
++      </View>}
+         <View style={styles.maskOuter}>
+           <View style={[styles.maskRow, this._applyMaskFrameStyle()]} />
+           <View style={[{ height }, styles.maskCenter]} >
