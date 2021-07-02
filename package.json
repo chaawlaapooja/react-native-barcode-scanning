@@ -15,8 +15,7 @@
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-barcode-mask": "^1.2.4",
-    "react-native-camera": "^3.44.1",
-    "react-native-modal": "^12.0.2"
+    "react-native-camera": "^3.44.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
